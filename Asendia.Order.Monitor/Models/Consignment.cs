@@ -8,7 +8,7 @@ namespace Asendia.Order.Monitor
         public string OrderNumber { get; set; }
         public string ConsigneeName { get; set; }
         public string Number { get; set; }
-        public List<Parcel> Parcels { get; set; }
+        public List<Parcel> Parcels { get; set; } = new List<Parcel>();
 
         public XElement ToXElement(XNamespace xmns)
         {

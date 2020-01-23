@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Asendia.Order.Monitor
 {
     public class OrderCollection : List<Order>
     {
-        private readonly XNamespace xnameSpace = XNamespace.Get(@"http://www.sitemaps.org/schemas/sitemap/0.9");
+        private readonly XNamespace xnameSpace = XNamespace.Get(@"http://www.w3.org/TR/xml-names11");
 
         public void Save(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                //log
-                return;
+                throw new Exception("XML File Path NOT provided");
             }
             this.GetXDocument().Save(filePath);
         }

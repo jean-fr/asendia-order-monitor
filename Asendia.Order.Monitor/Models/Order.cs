@@ -7,7 +7,8 @@ namespace Asendia.Order.Monitor
     public class Order
     {
         public string Number { get; set; }
-        public List<Consignment> Consignments { get; set; }
+        public List<Consignment> Consignments { get; set; } = new List<Consignment>();
+        public ShippingAddress ShippingAddress { get; set; } = new ShippingAddress();
 
         private double TotalValue
         {
@@ -26,14 +27,10 @@ namespace Asendia.Order.Monitor
         public XElement ToXElement(XNamespace xmns)
         {
             XElement xOrder = new XElement(xmns + "Order");
-
             XElement xNumber = new XElement(xmns + "Number") { Value = this.Number };
+            
             XElement xTotalValue = new XElement(xmns + "TotalValue") { Value = this.TotalValue.ToString() };
             XElement xTotalWeight = new XElement(xmns + "TotalWeight") { Value = this.TotalWeight.ToString() };
-
-            xOrder.Add(xTotalValue);
-            xOrder.Add(xTotalWeight);
-
             XElement xConsignments = new XElement(xmns + "Consignments");
 
             foreach (var cons in this.Consignments)
@@ -42,6 +39,9 @@ namespace Asendia.Order.Monitor
             }
 
             xOrder.Add(xNumber);
+            xOrder.Add(xTotalValue);
+            xOrder.Add(xTotalWeight);
+            xOrder.Add(this.ShippingAddress.ToXElement(xmns));
             xOrder.Add(xConsignments);
             return xOrder;
         }
