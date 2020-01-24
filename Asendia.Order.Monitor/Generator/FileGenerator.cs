@@ -8,37 +8,42 @@ namespace Asendia.Order.Monitor
 {
     public class FileGenerator : IFileGenerator
     {
+        private readonly ILogger _logger;
+        public FileGenerator(ILogger logger)
+        {
+            this._logger = logger;
+        }
         private string _outputDir;
         public int Execute(OrderOptions opts)
         {
             if (string.IsNullOrEmpty(opts.Source))
             {
-                MessageHelper.WriteLine(LogLevel.Error, "Please provide the source directory FULL PATH");
+                this.LogInfo("Please provide the source directory FULL PATH", LogLevel.Error);
                 return -1;
             }
 
             if (!Directory.Exists(opts.Source))
             {
-                MessageHelper.WriteLine(LogLevel.Error, "The provided source directory doesn't exist, please provide an existing one");
+                this.LogInfo("The provided source directory doesn't exist, please provide an existing one", LogLevel.Error);
                 return -1;
             }
 
             if (string.IsNullOrEmpty(opts.Output))
             {
-                MessageHelper.WriteLine(LogLevel.Error, "Please provide the output directory FULL PATH");
+                this.LogInfo("Please provide the output directory FULL PATH", LogLevel.Error);
                 return -1;
             }
 
             if (!Directory.Exists(opts.Output))
             {
-                MessageHelper.WriteLine(LogLevel.Error, "The provided output directory doesn't exist, please provide an existing one");
+                this.LogInfo("The provided output directory doesn't exist, please provide an existing one", LogLevel.Error);
                 return -1;
             }
 
             var files = Directory.GetFiles(opts.Source, "*.csv");
             if (files.Length == 0)
             {
-                MessageHelper.WriteLine(LogLevel.Error, "No CSV file was found in the source directory, please make sure at least one CSV file exists");
+                this.LogInfo("No CSV file was found in the source directory, please make sure at least one CSV file exists", LogLevel.Error);
                 return -1;
             }
 
@@ -52,28 +57,28 @@ namespace Asendia.Order.Monitor
                     var fileName = Path.GetFileNameWithoutExtension(filePath);
                     if (!File.Exists(filePath))
                     {
-                        MessageHelper.WriteLine(LogLevel.Error, $"File {fileName}.csv doesn't exist");
+                        this.LogInfo($"File {fileName}.csv doesn't exist", LogLevel.Error);
                         continue;
                     }
 
-                    MessageHelper.WriteLine(LogLevel.Info, $"Processing File {fileName}.csv ...");
+                    this.LogInfo($"Processing File {fileName}.csv ...", LogLevel.Info);
                     var result = this.ProcessFile(filePath, fileName);
 
                     if (!result.Success)
                     {
-                        MessageHelper.WriteLine(LogLevel.Error, $"File {fileName}.xml generation failed - ERROR | {result.Error}");
+                        this.LogInfo($"File {fileName}.xml generation failed - ERROR | {result.Error}", LogLevel.Error);
                     }
                     else
                     {
-                        MessageHelper.WriteLine(LogLevel.Info, $"File {fileName}.xml has been generated successfully");
+                        this.LogInfo($"File {fileName}.xml has been generated successfully", LogLevel.Info);
                     }
 
                     proceeded++;
-                    MessageHelper.DisplayProgress(proceeded, files.Count());
+                    MessageHelper.DisplayProgress(this._logger, proceeded, files.Count());
                 }
                 catch (Exception ex)
                 {
-                    MessageHelper.WriteLine(LogLevel.Error, $"An Error has occured with File {filePath}. ERROR | {ex.Message}");
+                    this.LogInfo($"An Error has occured with File {filePath}. ERROR | {ex.Message}", LogLevel.Error);
                     continue;
                 }
             }
@@ -104,7 +109,6 @@ namespace Asendia.Order.Monitor
                 result.Error = $"File {filePath} has wrong headers";
                 return result;
             }
-
 
             var orders = lines.Skip(1);
 
@@ -240,6 +244,19 @@ namespace Asendia.Order.Monitor
                 ordersList.Add(dataLine);
             }
             return ordersList;
+        }
+
+        private void LogInfo(string message, LogLevel level = null)
+        {
+            if (level != null)
+            {
+                MessageHelper.WriteLine(this._logger, level, message);
+            }
+            else
+            {
+                MessageHelper.WriteLine(this._logger, message);
+            }
+
         }
     }
 }
