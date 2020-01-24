@@ -7,13 +7,13 @@ namespace Asendia.Order.Monitor
     [Verb("orders", HelpText = "Generate orders xml files")]
     public class OrderOptions
     {
-        [Option('s', "source", HelpText = "Source Directory full path, where the CSV files are stored")]
+        [Option('s', "source", HelpText = "Source Directory full path, where the CSV files are stored", Required = true)]
         public string Source { get; set; }
 
-        [Option('o', "output", HelpText = "Output Directory full path, where the XML files will be stored")]
+        [Option('o', "output", HelpText = "Output Directory full path, where the XML files will be stored", Required = true)]
         public string Output { get; set; }
 
-        [Usage(ApplicationAlias = "Monitor")]
+        [Usage(ApplicationAlias = "OrderMonitor")]
         public static IEnumerable<Example> Examples
         {
             get

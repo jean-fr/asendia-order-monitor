@@ -12,14 +12,14 @@ namespace Asendia.Order.Monitor
             var parser = new Parser(config => config.HelpWriter = Console.Out);
 
             parser.ParseArguments<OrderOptions>(args)
-                    .MapResult((OrderOptions opts) => container.Resolve<FileGenerator>().Execute(opts), errs => -1);
+                    .MapResult((OrderOptions opts) => container.Resolve<IFileGenerator>().Execute(opts), errs => -1);
         }
 
         //Register dependencies
         private static IContainer SetupIocContainer()
         {
             var container = new ContainerBuilder();
-            container.RegisterType<FileGenerator>().As<IFileGenerator>().SingleInstance();        
+            container.RegisterType<FileGenerator>().As<IFileGenerator>().SingleInstance();
             return container.Build();
         }
     }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Asendia.Order.Monitor
 {
@@ -44,12 +43,11 @@ namespace Asendia.Order.Monitor
             }
 
             this._outputDir = opts.Output;
+            var proceeded = 0;
 
-            try
+            foreach (var filePath in files)
             {
-                var proceeded = 0;
-
-                foreach (var filePath in files)
+                try
                 {
                     var fileName = Path.GetFileNameWithoutExtension(filePath);
                     if (!File.Exists(filePath))
@@ -73,11 +71,11 @@ namespace Asendia.Order.Monitor
                     proceeded++;
                     MessageHelper.DisplayProgress(proceeded, files.Count());
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageHelper.WriteLine(LogLevel.Error, $"An Error has occured. ERROR | {ex.Message}");
-                return -1;
+                catch (Exception ex)
+                {
+                    MessageHelper.WriteLine(LogLevel.Error, $"An Error has occured with File {filePath}. ERROR | {ex.Message}");
+                    continue;
+                }
             }
 
             return 0;
@@ -98,6 +96,8 @@ namespace Asendia.Order.Monitor
             }
 
             var headers = headersLine.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            headers = headers.Select(x => x.Trim()).ToArray();
+
             if (!headers.All(h => DataHelper.HeaderMapping.ContainsValue(h)))
             {
                 result.Success = false;
@@ -105,19 +105,56 @@ namespace Asendia.Order.Monitor
                 return result;
             }
 
-          
+
             var orders = lines.Skip(1);
 
             var ordersList = this.GetDataList(orders, headers);
-
-            /*Fill object collections*/
-            //TODO Fill OrderCollection with orders and children
+            if (!ordersList.Any())
+            {
+                /*Shouldn't happen*/
+                result.Success = false;
+                result.Error = $"Something went wromg for File {fileName} | collection is empty";
+                return result;
+            }
 
             var orderCollection = new OrderCollection();
-           // orderCollection.AddRange(ordersList);
+
+            /*Fill object collections*/
+            var groupedOrders = ordersList.GroupBy(o => o.OrderNumber);
+            foreach (var group in groupedOrders)
+            {
+                var k = group.Key;
+
+                foreach (var o in group)
+                {
+                    if (orderCollection.FirstOrDefault(x => x.Number == k) != null)
+                    {
+                        //already in
+                        this.FillOrder(o, orderCollection.FirstOrDefault(x => x.Number == k));
+                    }
+                    else
+                    {
+                        var order = new Order { Number = k, ShippingAddress = new ShippingAddress { Address1 = o.Address1, Address2 = o.Address2, City = o.City, CountryCode = o.CountryCode, State = o.State } };
+                        this.FillOrder(o, order);
+                        orderCollection.Add(order);
+                    }
+                }
+            }
+
             orderCollection.Save(Path.Combine(this._outputDir, $"{fileName}.xml"));
             result.Success = true;
             return result;
+        }
+
+        private void FillOrder(CsvLineData orderData, Order order)
+        {
+            var cons = new Consignment { ConsigneeName = orderData.ConsigneeName, Number = orderData.ConsignmentNumber, OrderNumber = orderData.OrderNumber };
+            var parcel = new Parcel { Code = orderData.ParcelCode, ConsignmentNumber = orderData.ConsignmentNumber };
+            var item = new Item { Currency = orderData.ItemCurrency, Description = orderData.ItemDescription, ParcelCode = orderData.ParcelCode, Quantity = orderData.ItemQuantity, Value = orderData.ItemValue, Weight = orderData.ItemWeight };
+
+            parcel.Items.Add(item);
+            cons.Parcels.Add(parcel);
+            order.Consignments.Add(cons);
         }
 
         private List<CsvLineData> GetDataList(IEnumerable<string> orders, string[] headers)
@@ -125,12 +162,13 @@ namespace Asendia.Order.Monitor
             var ordersList = new List<CsvLineData>();
             foreach (var order in orders)
             {
-                var dataArray = order.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                var dataArray = order.Split(new string[] { "," }, StringSplitOptions.None);
+                dataArray = dataArray.Select(x => x.Trim()).ToArray();
+
                 var dataLine = new CsvLineData();
 
                 for (var i = 0; i < dataArray.Length; i++)
                 {
-                    /*get key by value*/
                     var mappingKey = DataHelper.HeaderMapping.FirstOrDefault(h => h.Value == headers[i]).Key;
 
                     switch (mappingKey)
@@ -148,10 +186,22 @@ namespace Asendia.Order.Monitor
                             dataLine.ParcelCode = dataArray[i];
                             break;
                         case nameof(dataLine.ItemValue):
-                            dataLine.ItemValue = string.IsNullOrEmpty(dataArray[i]) ? 0 : Convert.ToDouble(dataArray[i]);
+                            if (!string.IsNullOrEmpty(dataArray[i]))
+                            {
+                                if (double.TryParse(dataArray[i], out double v))
+                                {
+                                    dataLine.ItemValue = v;
+                                }
+                            }
                             break;
                         case nameof(dataLine.ItemQuantity):
-                            dataLine.ItemQuantity = string.IsNullOrEmpty(dataArray[i]) ? 0 : Convert.ToInt32(dataArray[i]);
+                            if (!string.IsNullOrEmpty(dataArray[i]))
+                            {
+                                if (int.TryParse(dataArray[i], out int v))
+                                {
+                                    dataLine.ItemQuantity = v;
+                                }
+                            }
                             break;
                         case nameof(dataLine.ItemDescription):
                             dataLine.ItemDescription = dataArray[i];
@@ -160,7 +210,13 @@ namespace Asendia.Order.Monitor
                             dataLine.ItemCurrency = dataArray[i];
                             break;
                         case nameof(dataLine.ItemWeight):
-                            dataLine.ItemWeight = string.IsNullOrEmpty(dataArray[i]) ? 0 : Convert.ToDouble(dataArray[i]);
+                            if (!string.IsNullOrEmpty(dataArray[i]))
+                            {
+                                if (double.TryParse(dataArray[i], out double v))
+                                {
+                                    dataLine.ItemWeight = v;
+                                }
+                            }
                             break;
                         case nameof(dataLine.Address1):
                             dataLine.Address1 = dataArray[i];
