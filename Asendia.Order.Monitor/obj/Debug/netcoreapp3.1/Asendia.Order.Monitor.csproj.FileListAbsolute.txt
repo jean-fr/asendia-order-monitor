@@ -1,0 +1,16 @@
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.exe
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.deps.json
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.runtimeconfig.json
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.runtimeconfig.dev.json
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.dll
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Asendia.Order.Monitor.pdb
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\obj\Debug\netcoreapp3.1\Asendia.Order.Monitor.AssemblyInfoInputs.cache
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\obj\Debug\netcoreapp3.1\Asendia.Order.Monitor.AssemblyInfo.cs
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\obj\Debug\netcoreapp3.1\Asendia.Order.Monitor.dll
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\obj\Debug\netcoreapp3.1\Asendia.Order.Monitor.pdb
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\CommandLine.dll
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\obj\Debug\netcoreapp3.1\Asendia.Order.Monitor.csproj.CopyComplete
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Autofac.dll
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\NLog.dll
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\NLog.config
+C:\Projects\Asendia\Asendia.Order.Monitor\Asendia.Order.Monitor\bin\Debug\netcoreapp3.1\Logs\log.txt
