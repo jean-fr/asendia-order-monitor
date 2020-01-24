@@ -115,7 +115,6 @@ namespace Asendia.Order.Monitor
             var ordersList = this.GetDataList(orders, headers);
             if (!ordersList.Any())
             {
-                /*Shouldn't happen*/
                 result.Success = false;
                 result.Error = $"Something went wromg for File {fileName} | collection is empty";
                 return result;
@@ -123,7 +122,8 @@ namespace Asendia.Order.Monitor
 
             var orderCollection = new OrderCollection();
 
-            /*Fill object collections*/
+            /*Fill object collection*/
+            /*Group by Order number since an order can have more than one consignment*/
             var groupedOrders = ordersList.GroupBy(o => o.OrderNumber);
             foreach (var group in groupedOrders)
             {
@@ -145,6 +145,7 @@ namespace Asendia.Order.Monitor
                 }
             }
 
+            /*Save the file with orders info as XML*/
             orderCollection.Save(Path.Combine(this._outputDir, $"{fileName}.xml"));
             result.Success = true;
             return result;
